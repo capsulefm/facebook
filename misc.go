@@ -253,6 +253,7 @@ func decodeField(val interface{}, field reflect.Value, fullName string) error {
 
 	kind := field.Kind()
 
+	//	fmt.Println("decodeField:", kind, val, field, fullName)
 	switch kind {
 	case reflect.Bool:
 		if b, ok := val.(bool); ok {
@@ -390,15 +391,20 @@ func decodeField(val interface{}, field reflect.Value, fullName string) error {
 		}
 
 	case reflect.Struct:
+		//		fmt.Println("*** struct", val, kind)
 		if r, ok := val.(map[string]interface{}); ok {
 			if err := Result(r).decode(field, fullName); err != nil {
 				return err
 			}
 		} else {
-			return fmt.Errorf("field '%v' is not a json object in result.", fullName)
+			//			fmt.Printf("field '%v' is not a json object in result.\n", fullName)
+			//			return fmt.Errorf("field '%v' is not a json object in result.", fullName)
 		}
 
 	case reflect.Map:
+		if !reflect.ValueOf(val).IsValid() || reflect.ValueOf(val).Len() == 0 {
+			fmt.Println("Invalid map for facebook shit!!!!!!!!!!!!!!!!!!!!!!!")
+		}
 		if m, ok := val.(map[string]interface{}); ok {
 			// map key must be string
 			if field.Type().Key().Kind() != reflect.String {
@@ -441,6 +447,9 @@ func decodeField(val interface{}, field reflect.Value, fullName string) error {
 		}
 
 	case reflect.Slice, reflect.Array:
+		if !reflect.ValueOf(val).IsValid() || reflect.ValueOf(val).Len() == 0 {
+			//			fmt.Println("Invalid slice for facebook shit!!!!!!!!!!!!!!!!!!!!!!!")
+		}
 		if a, ok := val.([]interface{}); ok {
 			if kind == reflect.Array {
 				if field.Len() < len(a) {
