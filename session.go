@@ -25,7 +25,6 @@ import (
 // If facebook returns error in response, returns error details in res and set err.
 func (session *Session) Api(path string, method Method, params Params) (Result, error) {
 	res, err := session.graph(path, method, params)
-
 	if res != nil {
 		if err == nil {
 			code := res["error_code"]
@@ -209,6 +208,8 @@ func (session *Session) graph(path string, method Method, params Params) (res Re
 	if err != nil {
 		res = nil
 		err = fmt.Errorf("cannot format facebook response. %v", err)
+		fmt.Println("facebook.session.graph().path:", graphUrl)
+		fmt.Println("facebook.session.graph().json:", string(response))
 		return
 	}
 
@@ -262,7 +263,10 @@ func (session *Session) makeRequest(url string, params Params) ([]byte, error) {
 
 	response, err := http.Post(url, mime, buf)
 
-	if err != nil {
+	if err == nil && response != nil && response.StatusCode != 200 {
+		err = fmt.Errorf("facebook.session.makeRequest error: %d", response.StatusCode)
+		return nil, err
+	} else if err != nil {
 		return nil, fmt.Errorf("cannot reach facebook server. %v", err)
 	}
 
@@ -270,6 +274,8 @@ func (session *Session) makeRequest(url string, params Params) ([]byte, error) {
 
 	buf = &bytes.Buffer{}
 	_, err = io.Copy(buf, response.Body)
+
+	//	fmt.Println("facebook.session.makeRequest:\n", string(buf.Bytes()))
 
 	if err != nil {
 		return nil, fmt.Errorf("cannot read facebook response. %v", err)

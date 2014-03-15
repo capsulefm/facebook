@@ -386,7 +386,15 @@ func decodeField(val interface{}, field reflect.Value, fullName string) error {
 			if s, ok := val.(string); ok {
 				field.SetString(s)
 			} else {
-				return fmt.Errorf("field '%v' is not a string in result.", fullName)
+				if i, ok := val.(int64); ok {
+					field.SetString(fmt.Sprintf("%d", i))
+				} else {
+					if f, ok := val.(float64); ok {
+						field.SetString(fmt.Sprintf("%d", int64(f)))
+					} else {
+						return fmt.Errorf("field '%v' is not a string in result.", fullName)
+					}
+				}
 			}
 		}
 
