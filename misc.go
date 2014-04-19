@@ -296,11 +296,12 @@ func decodeField(val interface{}, field reflect.Value, fullName string) error {
 		}
 
 	case reflect.Int64:
-		if n, ok := val.(float64); ok {
+		if !reflect.ValueOf(val).IsValid() {
+			field.SetInt(0)
+		} else if n, ok := val.(float64); ok {
 			if n < -9223372036854775808 || n > 9223372036854775807 {
 				return fmt.Errorf("field '%v' value exceeds the range of int64.", fullName)
 			}
-
 			field.SetInt(int64(n))
 		} else {
 			return fmt.Errorf("field '%v' is not an integer in result.", fullName)
