@@ -274,7 +274,9 @@ func decodeField(val interface{}, field reflect.Value, fullName string) error {
 		}
 
 	case reflect.Int16:
-		if n, ok := val.(float64); ok {
+		if !reflect.ValueOf(val).IsValid() {
+			field.SetInt(0)
+		} else if n, ok := val.(float64); ok {
 			if n < -32768 || n > 32767 {
 				return fmt.Errorf("field '%v' value exceeds the range of int16.", fullName)
 			}
@@ -285,7 +287,9 @@ func decodeField(val interface{}, field reflect.Value, fullName string) error {
 		}
 
 	case reflect.Int32:
-		if n, ok := val.(float64); ok {
+		if !reflect.ValueOf(val).IsValid() {
+			field.SetInt(0)
+		} else if n, ok := val.(float64); ok {
 			if n < -2147483648 || n > 2147483647 {
 				return fmt.Errorf("field '%v' value exceeds the range of int32.", fullName)
 			}
@@ -308,7 +312,9 @@ func decodeField(val interface{}, field reflect.Value, fullName string) error {
 		}
 
 	case reflect.Int:
-		if n, ok := val.(float64); ok {
+		if !reflect.ValueOf(val).IsValid() {
+			field.SetInt(0)
+		} else if n, ok := val.(float64); ok {
 			if n < -9223372036854775808 || n > 9223372036854775807 {
 				return fmt.Errorf("field '%v' value exceeds the range of int.", fullName)
 			}
